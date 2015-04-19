@@ -13,8 +13,6 @@ span {
     width: 900px;
     height: 600px;
     background-color: #000;
-    margin: 0 auto;
-    display: block;
 }
 
 image, canvas {

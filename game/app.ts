@@ -177,7 +177,7 @@ function start() {
     console.log("start");
 
     var baseMusic = data.music["music"].music;
-    baseMusic.volume = 0.4;
+    baseMusic.volume = 0.3;
     baseMusic.play();
 
 
