@@ -52,11 +52,11 @@ var Player = (function (_super) {
     };
     Player.prototype.updateInput = function () {
         this.moveDirection = 0;
-        if (keyboard.isDown(65)) {
+        if (keyboard.isDown(37)) {
             this.moveDirection = -1;
             this.sprite.flip = this.onWall ? false : true;
         }
-        else if (keyboard.isDown(68)) {
+        else if (keyboard.isDown(39)) {
             this.moveDirection = 1;
             this.sprite.flip = this.onWall ? true : false;
         }
@@ -73,7 +73,7 @@ var Player = (function (_super) {
                 this.startAnimation(0);
             }
         }
-        this.jumpDown = keyboard.isDown(87) || keyboard.isDown(32);
+        this.jumpDown = keyboard.isDown(38) || keyboard.isDown(32);
         if (this.jumpDown) {
             this.startAnimation(3);
         }

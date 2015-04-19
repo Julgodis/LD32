@@ -51,6 +51,8 @@ window.onload = function () {
     data.textures["hero_normal"] = Loader.ReadTextureResource("textures/hero_normal.png", { pixelate: true });
     data.textures["hero_parts"] = Loader.ReadTextureResource("textures/hero_parts.png", { pixelate: true });
     data.textures["hero_parts_normal"] = Loader.ReadTextureResource("textures/hero_parts_normal.png", { pixelate: true });
+    data.textures["princess"] = Loader.ReadTextureResource("textures/princess.png", { pixelate: true });
+    data.textures["princess_normal"] = Loader.ReadTextureResource("textures/princess_normal.png", { pixelate: true });
     data.textures["rock"] = Loader.ReadTextureResource("textures/rock.png", { pixelate: true });
     data.textures["rock_normal"] = Loader.ReadTextureResource("textures/rock_normal.png", { pixelate: true });
     data.textures["slope"] = Loader.ReadTextureResource("textures/slope.png", { pixelate: true });
@@ -71,6 +73,10 @@ window.onload = function () {
     data.textures["title_normal"] = Loader.ReadTextureResource("textures/title_normal.png", { pixelate: true });
     data.textures["controls"] = Loader.ReadTextureResource("textures/controls.png", { pixelate: true });
     data.textures["controls_normal"] = Loader.ReadTextureResource("textures/controls_normal.png", { pixelate: true });
+    data.textures["win"] = Loader.ReadTextureResource("textures/win.png", { pixelate: true });
+    data.textures["win_normal"] = Loader.ReadTextureResource("textures/win_normal.png", { pixelate: true });
+    data.textures["lose"] = Loader.ReadTextureResource("textures/lose.png", { pixelate: true });
+    data.textures["lose_normal"] = Loader.ReadTextureResource("textures/lose_normal.png", { pixelate: true });
     data.textures["play"] = Loader.ReadTextureResource("textures/play.png", { pixelate: true });
     data.textures["play_hover"] = Loader.ReadTextureResource("textures/play_hover.png", { pixelate: true });
     data.textures["play_normal"] = Loader.ReadTextureResource("textures/play_normal.png", { pixelate: true });
@@ -116,7 +122,7 @@ function start() {
     console.log("start");
     var baseMusic = data.music["music"].music;
     baseMusic.volume = 0.4;
-    //baseMusic.play();
+    baseMusic.play();
     context = new WebGL("glCanvas", 900, 600, true);
     context.initialize();
     keyboard = new Keyboard(context.canvasElement);
@@ -182,6 +188,106 @@ function start() {
     requestAnimationFrame(render);
     lastTime = new Date().getTime();
 }
+function win() {
+    for (var id in objects) {
+        var obj = objects[id];
+        if (obj.sprite) {
+            context.passes[0].removeSprite(obj.sprite);
+        }
+    }
+    for (var id in styles) {
+        var style = styles[id];
+        if (style.sprite) {
+            context.passes[0].removeSprite(style.sprite);
+        }
+    }
+    objects = [];
+    styles = [];
+    lights = [];
+    player = null;
+    addBackground();
+    titleLight = addTorch((worldBound.x) / 2, (worldBound.y * 2) / 4, 20);
+    {
+        var sprite = new Sprite(0, 0, 1.06, 554 * 2.7, 324 * 2.7);
+        sprite.color = new vec4([1.0, 1.0, 1.0, 1.0]);
+        sprite.textures = [
+            data.textures["win"].texture,
+            data.textures["win_normal"].texture
+        ];
+        var object = new Tile(new vec2([worldBound.x / 2 - sprite.width * 0.5 * ppm, worldBound.y / 2 - sprite.height * 0.5 * ppm]), new vec2([sprite.width, sprite.height]).mul(ppm));
+        object.sprite = sprite;
+        object.isStatic = true;
+        sprite.matrix = mat3.makeTranslate(object.position.x * mpp, object.position.y * mpp);
+        context.passes[0].addSprite(sprite);
+        objects.push(object);
+        winObject = object;
+    }
+    {
+        var sprite = new Sprite(0, 0, 1.05, 80 * 2, 38 * 2);
+        sprite.color = new vec4([1.0, 1.0, 1.0, 1.0]);
+        sprite.textures = [
+            data.textures["play"].texture,
+            data.textures["play_normal"].texture
+        ];
+        var object = new Tile(new vec2([worldBound.x / 2 - 40 * 2 * ppm, worldBound.y - worldBound.y / 4]), new vec2([80 * 2, 38 * 2]).mul(ppm));
+        object.sprite = sprite;
+        object.isStatic = true;
+        sprite.matrix = mat3.makeTranslate(object.position.x * mpp, object.position.y * mpp);
+        context.passes[0].addSprite(sprite);
+        objects.push(object);
+        playButton = object;
+    }
+}
+function lose() {
+    for (var id in objects) {
+        var obj = objects[id];
+        if (obj.sprite) {
+            context.passes[0].removeSprite(obj.sprite);
+        }
+    }
+    for (var id in styles) {
+        var style = styles[id];
+        if (style.sprite) {
+            context.passes[0].removeSprite(style.sprite);
+        }
+    }
+    objects = [];
+    styles = [];
+    lights = [];
+    player = null;
+    addBackground();
+    titleLight = addTorch((worldBound.x) / 2, (worldBound.y * 2) / 4, 20);
+    {
+        var sprite = new Sprite(0, 0, 1.06, 554 * 2.7, 324 * 2.7);
+        sprite.color = new vec4([1.0, 1.0, 1.0, 1.0]);
+        sprite.textures = [
+            data.textures["lose"].texture,
+            data.textures["lose_normal"].texture
+        ];
+        var object = new Tile(new vec2([worldBound.x / 2 - sprite.width * 0.5 * ppm, worldBound.y / 2 - sprite.height * 0.5 * ppm]), new vec2([sprite.width, sprite.height]).mul(ppm));
+        object.sprite = sprite;
+        object.isStatic = true;
+        sprite.matrix = mat3.makeTranslate(object.position.x * mpp, object.position.y * mpp);
+        context.passes[0].addSprite(sprite);
+        objects.push(object);
+        winObject = object;
+    }
+    {
+        var sprite = new Sprite(0, 0, 1.05, 80 * 2, 38 * 2);
+        sprite.color = new vec4([1.0, 1.0, 1.0, 1.0]);
+        sprite.textures = [
+            data.textures["play"].texture,
+            data.textures["play_normal"].texture
+        ];
+        var object = new Tile(new vec2([worldBound.x / 2 - 40 * 2 * ppm, worldBound.y - worldBound.y / 4]), new vec2([80 * 2, 38 * 2]).mul(ppm));
+        object.sprite = sprite;
+        object.isStatic = true;
+        sprite.matrix = mat3.makeTranslate(object.position.x * mpp, object.position.y * mpp);
+        context.passes[0].addSprite(sprite);
+        objects.push(object);
+        playButton = object;
+    }
+}
 function startGame() {
     for (var id in objects) {
         var obj = objects[id];
@@ -201,10 +307,10 @@ function startGame() {
     addBackground();
     var baseY = Math.round((worldBound.y) / (128 * ppm) - 1) * 128 * ppm;
     addGround(baseY);
-    addBase(baseY - (1 * 128 * ppm));
+    addBase(-13, baseY - (1 * 128 * ppm));
     var yLevel = 0;
     var next = 0;
-    for (var x = 0; x < 60; x++) {
+    for (var x = 0; x < 80; x++) {
         var meterX = x * 128 * ppm;
         var meterY = baseY - ((yLevel + 1) * 128 * ppm);
         var meterYm1 = baseY - ((yLevel) * 128 * ppm);
@@ -224,7 +330,7 @@ function startGame() {
             change = -5;
         if (yLevel == 0 && change < 0)
             change = 0;
-        if (x == 59) {
+        if (x == 79) {
             change = -yLevel;
         }
         var fy = 0;
@@ -249,18 +355,41 @@ function startGame() {
             var my = baseY - ((y + 1) * 128 * ppm);
             addBlockStyle(meterX, my);
         }
-        if (Math.random() > 0.60) {
+        if (Math.random() > 0.85) {
             for (var e = 0; e < 1 + Math.random() * 2; e++)
-                addEnemy(2 + x * 2 + Math.random() * 3 + e, baseY - ((yLevel + 3) * 128 * ppm));
+                addEnemy(2 + x + Math.random() * 3 + e, baseY - ((yLevel + 3) * 128 * ppm));
         }
         yLevel += change;
         if (x == next) {
             next = x + Math.round(3 + Math.random() * 5);
-            addTorch(x, baseY - ((yLevel + 2) * 128 * ppm) - (Math.random() - 0.3) * 0.7);
+            addTorch(x * 128 * ppm, baseY - ((yLevel + 2) * 128 * ppm) - (Math.random() - 0.3) * 0.7);
         }
     }
+    for (var e = 0; e < 20; e++)
+        addTorch((80 + e * 2) * 128 * ppm, baseY - ((2) * 128 * ppm));
+    for (var e = 0; e < 20; e++)
+        addEnemy((85 + e / 2) * 128 * ppm, baseY - ((4) * 128 * ppm));
+    addBase(110 * 128 * ppm, baseY - (1 * 128 * ppm));
+    addPrincess(-20, baseY - (2 * 128 * ppm));
+    addPrincess(105 * 128 * ppm, baseY - (2 * 128 * ppm));
     addPlayer();
     addRock();
+}
+function addPrincess(x, y) {
+    var sprite = new Sprite(0, 0, 1, 20 * 7, 20 * 7);
+    sprite.color = new vec4([1.0, 1.0, 1.0, 1.0]);
+    sprite.textures = [
+        data.textures["princess"].texture,
+        data.textures["princess_normal"].texture
+    ];
+    var object = new Princess(new vec2([x, y]), new vec2([4 * 7, 20 * 7]).mul(ppm));
+    object.offset = new vec2([8 * 7, 0]).mul(ppm);
+    object.sprite = sprite;
+    object.isStatic = false;
+    object.velocity.y = -1;
+    object.velocity.x = 0;
+    context.passes[0].addSprite(sprite);
+    objects.push(object);
 }
 function addPlayer() {
     var sprite = new Sprite(0, 0, 2, 20 * 7, 20 * 7);
@@ -421,7 +550,7 @@ function addBlockStyle(x, y) {
     context.passes[0].addSprite(sprite);
     styles.push(style);
 }
-function addBase(y) {
+function addBase(x, y) {
     var sprite = new Sprite(0, 0, 1, 128 * 10, 128 * 10);
     sprite.color = new vec4([1.0, 1.0, 1.0, 1.0]);
     sprite.texCoords = new vec4([0, 0, 10, 10]);
@@ -429,7 +558,7 @@ function addBase(y) {
         data.textures["wall"].texture,
         data.textures["wall_normal"].texture
     ];
-    var object = new Tile(new vec2([(-13) * 128 * ppm, y + (-9) * 128 * ppm]), new vec2([sprite.width, sprite.height]).mul(ppm));
+    var object = new Tile(new vec2([(x) * 128 * ppm, y + (-9) * 128 * ppm]), new vec2([sprite.width, sprite.height]).mul(ppm));
     object.sprite = sprite;
     object.isStatic = true;
     context.passes[0].addSprite(sprite);
@@ -453,6 +582,8 @@ var titleLight = {};
 var title;
 var controls;
 var playButton = null;
+var winObject = null;
+var loseObject = null;
 var controlTime;
 var time = 0;
 var mpp = 100.0;
@@ -468,10 +599,22 @@ var worldBound = new vec2([900, 600]).mul(ppm);
 function update() {
     keyboard.update();
     time += updateDt;
+    if (keyboard.press(77)) {
+        if (Sound.isOff == false) {
+            Sound.Off();
+            Music.Off();
+            data.music["music"].music.stop();
+        }
+        else {
+            Sound.On();
+            Music.On();
+            data.music["music"].music.play();
+        }
+    }
     // NOTE: Update the lights
     var lightsVisible = lights.filter(function (value, index, array) {
         if (player == null)
-            return (state <= 1);
+            return (state <= 1 || state >= 3);
         var delta = player.position.copy().mul(mpp).sub(value.position.xy);
         return delta.length2() < (900 * 900 + 600 * 600);
     });
@@ -484,6 +627,8 @@ function update() {
     }
     lightShader.uniforms.lightCount.value = (lightsVisible.length > 10 ? 10 : lightsVisible.length);
     for (var id in lightsVisible) {
+        if (id >= lightShader.uniforms.lightCount.value)
+            break;
         var uniform = lightShader.uniforms.lights.value[id];
         var light = lightsVisible[id];
         light.update(time, updateDt);
@@ -491,10 +636,9 @@ function update() {
         uniform.radius.value = light.radius;
         uniform.strength.value = light.strength;
         uniform.color.value = light.color;
-        if (id >= lightShader.uniforms.lightCount.value)
-            break;
     }
     if (state <= 1) {
+        camera = new vec2([0, 0]);
         if (state == 0) {
             playButton.sprite.textures[0] = data.textures["play"].texture;
             if (mouse.position.x > playButton.min.x * mpp && mouse.position.x < playButton.max.x * mpp) {
@@ -528,20 +672,30 @@ function update() {
         titleLight.light.position.y = my;
         return;
     }
-    if (keyboard.press(77)) {
-        if (Sound.isOff == false) {
-            Sound.Off();
-            Music.Off();
-            data.music["music"].music.stop();
+    else if (state == 4 || state == 3) {
+        camera = new vec2([0, 0]);
+        playButton.sprite.textures[0] = data.textures["play"].texture;
+        if (mouse.position.x > playButton.min.x * mpp && mouse.position.x < playButton.max.x * mpp) {
+            if (mouse.position.y > playButton.min.y * mpp && mouse.position.y < playButton.max.y * mpp) {
+                playButton.sprite.textures[0] = data.textures["play_hover"].texture;
+                if (mouse.leftDown) {
+                    state = 2;
+                    startGame();
+                    return;
+                }
+            }
         }
-        else {
-            Sound.On();
-            Music.On();
-            data.music["music"].music.play();
-        }
+        var mx = titleLight.x + Math.cos(time) * 200;
+        var my = titleLight.y + Math.sin(time) * 200;
+        titleLight.style.update(time, updateDt);
+        titleLight.style.sprite.matrix = mat3.makeTranslate(0, my - 8 * 6); //mx - 8 * 4, my - 8 * 6);
+        titleLight.style.sprite.x = mx - 8 * 4;
+        titleLight.light.position.x = mx;
+        titleLight.light.position.y = my;
+        return;
     }
     if (player != null) {
-        var playerPosition = player.position.copy().sub(player.size.copy().mul(0.5)).add(new vec2([2, 0]));
+        var playerPosition = player.position.copy().sub(player.size.copy().mul(0.5)).add(new vec2([2, 1]));
         var cameraPosition = camera.copy().add(worldBound).mul(new vec2([0.5, 0.6]));
         camera.add(playerPosition.sub(cameraPosition).mul(0.4));
     }
@@ -592,9 +746,11 @@ function update() {
                         objects.push(object);
                         context.passes[0].addSprite(sprite);
                     }
+                    state = 3;
+                    lose();
                     data.sounds["die"].sound.play();
                     player.remove = true;
-                    player = null;
+                    return;
                 }
                 else
                     player.onWall = false;
@@ -636,6 +792,18 @@ function update() {
                     obj.velocity.y = 0.00;
                 }
                 obj.velocity.x *= 0.995;
+            }
+            else if (obj instanceof Princess) {
+                var princess = obj;
+                if (player != null) {
+                    var delta = (princess.min.x + princess.size.x) - (player.min.x + player.size.x);
+                    princess.sprite.flip = (delta > 0);
+                    if (Math.abs(delta) < 0.5) {
+                        state = 4;
+                        win();
+                        return;
+                    }
+                }
             }
             else if (obj instanceof Enemy) {
                 var enemy = obj;
